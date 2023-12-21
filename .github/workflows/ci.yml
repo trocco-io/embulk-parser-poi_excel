@@ -5,6 +5,10 @@ on:
   push:
     tags:
       - "*"
+  pull_request:
+    branches:
+      - "master"
+    types: [opened, synchronize]
 
 jobs:
   main:
@@ -20,6 +24,7 @@ jobs:
           java-version: 1.8
       - name: lint
         run: ./gradlew spotlessCheck
+      - name: print version
         run: ./gradlew printVersion
       - name: Build Gem & Put it into './build/gems/' Directory
         run: ./gradlew gem
