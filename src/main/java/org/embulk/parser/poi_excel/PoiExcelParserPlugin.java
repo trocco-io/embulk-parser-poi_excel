@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -191,20 +190,17 @@ public class PoiExcelParserPlugin implements ParserPlugin {
 			throw new ConfigException("Attribute sheets is required but not set");
 		}
 
-		try (FileInputInputStream is = new FileInputInputStream(input)) {
+    try (FileInputInputStream is = new FileInputInputStream(input)) {
 			while (is.nextFile()) {
-				Workbook workbook;
-				try {
-					workbook = WorkbookFactory.create(is);
+				try (Workbook workbook = WorkbookFactory.create(is)) {
+					List<String> list = resolveSheetName(workbook, sheetNames);
+					if (log.isDebugEnabled()) {
+						log.debug("resolved sheet names={}", list);
+					}
+					run(task, schema, workbook, list, output);
 				} catch (IOException | EncryptedDocumentException e) {
 					throw new RuntimeException(e);
 				}
-
-				List<String> list = resolveSheetName(workbook, sheetNames);
-				if (log.isDebugEnabled()) {
-					log.debug("resolved sheet names={}", list);
-				}
-				run(task, schema, workbook, list, output);
 			}
 		}
 	}
