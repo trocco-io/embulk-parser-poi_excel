@@ -1,6 +1,8 @@
 package org.embulk.parser.poi_excel;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -191,13 +193,19 @@ public class PoiExcelParserPlugin implements ParserPlugin {
 		}
 
     try (FileInputInputStream is = new FileInputInputStream(input)) {
+			log.info("REACH");
 			while (is.nextFile()) {
 				try (Workbook workbook = WorkbookFactory.create(is)) {
 					List<String> list = resolveSheetName(workbook, sheetNames);
-					if (log.isDebugEnabled()) {
-						log.debug("resolved sheet names={}", list);
-					}
+					log.info("resolved sheet names={}", list);
 					run(task, schema, workbook, list, output);
+				} catch (OutOfMemoryError oom) {
+					log.info("Out of Memory Error: " + oom.getMessage());
+					oom.printStackTrace();
+					StringWriter sw = new StringWriter();
+					PrintWriter pw = new PrintWriter(sw);
+					oom.printStackTrace(pw);
+					log.info(sw.toString());
 				} catch (IOException | EncryptedDocumentException e) {
 					throw new RuntimeException(e);
 				}
