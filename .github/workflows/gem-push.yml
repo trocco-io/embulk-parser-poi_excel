@@ -3,14 +3,8 @@ name: Ruby Gem
 on:
   workflow_dispatch:
   push:
-    branches:
-      - "master"
     tags:
-      - "*"
-  pull_request:
-    branches:
-      - "master"
-    types: [opened, synchronize]
+      - '*'
 
 jobs:
   main:
@@ -24,10 +18,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - name: lint
-        # Run ./gradlew spotlessApply when failing on this step.
-        run: ./gradlew spotlessCheck
-      - run: ./gradlew test
       - name: Show Current Version
         run: ./gradlew printVersion
       - name: Build Gem & Put it into './build/gems/' Directory
