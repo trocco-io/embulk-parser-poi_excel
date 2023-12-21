@@ -10,10 +10,6 @@ on:
       - "master"
     types: [opened, synchronize]
 
-permissions:
-  contents: read
-  packages: write
-
 jobs:
   main:
     runs-on: ubuntu-latest
