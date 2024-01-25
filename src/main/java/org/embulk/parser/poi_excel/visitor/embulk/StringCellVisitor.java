@@ -32,11 +32,7 @@ public class StringCellVisitor extends CellVisitor {
 			}
 		}
 
-		String s = Double.toString(value);
-		if (s.endsWith(".0")) {
-			return s.substring(0, s.length() - 2);
-		}
-		return s;
+		return BigDecimal.valueOf(value).toPlainString();
 	}
 
 	protected String getNumericFormat(Column column) {
