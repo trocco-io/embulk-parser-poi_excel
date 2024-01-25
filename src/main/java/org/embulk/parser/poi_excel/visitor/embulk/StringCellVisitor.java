@@ -1,6 +1,7 @@
 package org.embulk.parser.poi_excel.visitor.embulk;
 
 import java.text.MessageFormat;
+import java.math.BigDecimal;
 
 import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.ss.usermodel.Sheet;
