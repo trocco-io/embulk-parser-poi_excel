@@ -1,6 +1,7 @@
 package org.embulk.parser.poi_excel.visitor.embulk;
 
 import java.text.MessageFormat;
+import java.math.BigDecimal;
 
 import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -32,11 +33,7 @@ public class StringCellVisitor extends CellVisitor {
 			}
 		}
 
-		String s = Double.toString(value);
-		if (s.endsWith(".0")) {
-			return s.substring(0, s.length() - 2);
-		}
-		return s;
+		return BigDecimal.valueOf(value).toPlainString();
 	}
 
 	protected String getNumericFormat(Column column) {
