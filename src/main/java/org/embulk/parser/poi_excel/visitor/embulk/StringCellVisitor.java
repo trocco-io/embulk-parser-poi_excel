@@ -33,7 +33,12 @@ public class StringCellVisitor extends CellVisitor {
 			}
 		}
 
-		return BigDecimal.valueOf(value).toPlainString();
+		String s = BigDecimal.valueOf(value).toPlainString();
+		// MEMO: BigDecimalを使用して数値を変換する際、桁数によって末尾に.0が付加されることがあるため削除する
+		if (s.endsWith(".0")) {
+				return s.substring(0, s.length() - 2);
+		}
+		return s;
 	}
 
 	protected String getNumericFormat(Column column) {
