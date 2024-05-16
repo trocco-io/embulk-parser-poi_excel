@@ -1,6 +1,8 @@
 package org.embulk.parser.poi_excel;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -9,7 +11,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -191,20 +192,23 @@ public class PoiExcelParserPlugin implements ParserPlugin {
 			throw new ConfigException("Attribute sheets is required but not set");
 		}
 
-		try (FileInputInputStream is = new FileInputInputStream(input)) {
+    try (FileInputInputStream is = new FileInputInputStream(input)) {
+			log.info("REACH");
 			while (is.nextFile()) {
-				Workbook workbook;
-				try {
-					workbook = WorkbookFactory.create(is);
+				try (Workbook workbook = WorkbookFactory.create(is)) {
+					List<String> list = resolveSheetName(workbook, sheetNames);
+					log.info("resolved sheet names={}", list);
+					run(task, schema, workbook, list, output);
+				} catch (OutOfMemoryError oom) {
+					log.info("Out of Memory Error: " + oom.getMessage());
+					oom.printStackTrace();
+					StringWriter sw = new StringWriter();
+					PrintWriter pw = new PrintWriter(sw);
+					oom.printStackTrace(pw);
+					log.info(sw.toString());
 				} catch (IOException | EncryptedDocumentException e) {
 					throw new RuntimeException(e);
 				}
-
-				List<String> list = resolveSheetName(workbook, sheetNames);
-				if (log.isDebugEnabled()) {
-					log.debug("resolved sheet names={}", list);
-				}
-				run(task, schema, workbook, list, output);
 			}
 		}
 	}
